@@ -51,3 +51,6 @@ C:\Users\Nakea\OneDrive\C#\MissingLinks\MissingLinks\bin\Newtonsoft.Json.xml
 C:\Users\Nakea\OneDrive\C#\MissingLinks\MissingLinks\obj\Release\MissingLinks.csprojResolveAssemblyReference.cache
 C:\Users\Nakea\OneDrive\C#\MissingLinks\MissingLinks\obj\Release\MissingLinks.dll
 C:\Users\Nakea\OneDrive\C#\MissingLinks\MissingLinks\obj\Release\MissingLinks.pdb
+C:\Users\Nakea\OneDrive\C#\MissingLinks\MissingLinks\bin\HtmlAgilityPack.dll
+C:\Users\Nakea\OneDrive\C#\MissingLinks\MissingLinks\bin\HtmlAgilityPack.pdb
+C:\Users\Nakea\OneDrive\C#\MissingLinks\MissingLinks\bin\HtmlAgilityPack.xml
