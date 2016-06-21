@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MissingLinks", "MissingLinks\MissingLinks.csproj", "{14E9B0A7-2617-4E60-B581-9F9D8C47B6A0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{52FD622B-FBE6-4158-9906-E9B4C6E299E6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{F7623D41-E2E6-47A1-BBA6-FC076F2A1266}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Scripts\Deploy-AzureResourceGroup.ps1 = PublishScripts\Scripts\Deploy-AzureResourceGroup.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{7B6F2D10-B570-4C9C-B5D5-81804C2F7C52}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Templates\MissingLinks.json = PublishScripts\Templates\MissingLinks.json
+		PublishScripts\Templates\MissingLinks.param.dev.json = PublishScripts\Templates\MissingLinks.param.dev.json
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14E9B0A7-2617-4E60-B581-9F9D8C47B6A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14E9B0A7-2617-4E60-B581-9F9D8C47B6A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14E9B0A7-2617-4E60-B581-9F9D8C47B6A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14E9B0A7-2617-4E60-B581-9F9D8C47B6A0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F7623D41-E2E6-47A1-BBA6-FC076F2A1266} = {52FD622B-FBE6-4158-9906-E9B4C6E299E6}
+		{7B6F2D10-B570-4C9C-B5D5-81804C2F7C52} = {52FD622B-FBE6-4158-9906-E9B4C6E299E6}
+	EndGlobalSection
+EndGlobal
