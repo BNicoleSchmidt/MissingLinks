@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using HtmlAgilityPack;
+using MissingLinks.Models;
 
 namespace MissingLinks.Controllers
 {
@@ -28,14 +29,13 @@ namespace MissingLinks.Controllers
             return View();
         }
 
-        public ActionResult SummonVeekun()
+        public ActionResult SummonVeekun(InputModel input)
         {
-            string result;
-            string Url = "http://www.veekun.com";
+            string Url = "http://www.veekun.com/dex/moves/" + input.Move;
             HtmlWeb web = new HtmlWeb();
             HtmlDocument doc = web.Load(Url);
 
-            result = doc.DocumentNode.SelectNodes("//*[@id=\"title\"]")[0].InnerText;
+            var result = doc.DocumentNode.SelectNodes("//*[@id=\"dex-page-name\"]")[0].InnerText;
             ViewBag.Message = result;
             return View();
         }

@@ -1,9 +1,33 @@
 ﻿@{
     ViewBag.Title = "Missing Links";
 }
+@model MissingLinks.Models.InputModel
 
-<p>This is where the magic happens. Later.</p>
-@Html.ActionLink("Try the thing", "SummonVeekun", "Home")
+<p>This is where the magic happens. Maybe.</p>
+
+@using (Html.BeginForm("SummonVeekun", "Home", FormMethod.Post))
+{
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Poke)
+    </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Poke)
+            @Html.ValidationMessageFor(model => model.Poke)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Move)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Move)
+            @Html.ValidationMessageFor(model => model.Move)
+        </div>
+
+        <p>
+            <input type="submit" value="Do the thing!" />
+        </p>
+}
+
 @*<div class="jumbotron">*@
 @*    <h1>ASP.NET</h1>*@
 @*    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>*@
