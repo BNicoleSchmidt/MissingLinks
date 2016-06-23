@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using HtmlAgilityPack;
@@ -44,21 +45,44 @@ namespace MissingLinks.Controllers
             {
                 return " Nothing learns this move by this method.";
             }
-            else
-            {
-                var levelUpBar = levelUpLabel[0].ParentNode;
-                var table = levelUpBar.ParentNode;
-                var levelUpLearnerTable = table.ChildNodes[table.ChildNodes.GetNodeIndex(levelUpBar) + 2];
-                var levelUpLearnerRows = levelUpLearnerTable.ChildNodes;
-                var learners = new List<string>();
-                learners.AddRange(GetNames(levelUpLearnerRows));
-                return learners.Aggregate("", (current, pokemon) => current + (" " + pokemon));
-            }
+            var levelUpBar = levelUpLabel[0].ParentNode;
+            var table = levelUpBar.ParentNode;
+            var levelUpLearnerTable = table.ChildNodes[table.ChildNodes.GetNodeIndex(levelUpBar) + 2];
+            var levelUpLearnerRows = levelUpLearnerTable.ChildNodes;
+            var pokeList = GetPokemon(levelUpLearnerRows);
+            return pokeList.Aggregate("", (current, pokemon) => current + " " + pokemon.Name);
         }
 
-        private static IEnumerable<string> GetNames(HtmlNodeCollection rows)
+        private static IEnumerable<Pokemon> GetPokemon(HtmlNodeCollection rows)
         {
-            return from row in rows where row.Name == "tr" from col in row.ChildNodes where col.InnerHtml.Contains("/dex/pokemon") select col.InnerText;
+            var pokeList = new List<Pokemon>();
+            foreach (var row in rows)
+            {
+                if (row.Name != "tr") continue;
+                var poke = new Pokemon();
+                foreach (var col in row.ChildNodes)
+                {
+                    if (col.InnerHtml.Contains("/dex/pokemon")) poke.Name = col.InnerText;
+                    if (col.Attributes["class"] == null || !col.Attributes["class"].Value.Contains("egg-group")) continue;
+                    if (!col.InnerHtml.Contains("<br>"))
+                    {
+                        poke.EggGroups.Add(col.InnerText.Trim());
+                    }
+                    else
+                    {
+                        var eggGroups = col.InnerHtml.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var eggGroup in eggGroups)
+                        {
+                            if (!string.IsNullOrWhiteSpace(eggGroup) && !eggGroup.Contains("<br>"))
+                            {
+                                poke.EggGroups.Add(eggGroup.Trim());
+                            }
+                        }
+                    }
+                }
+                pokeList.Add(poke);
+            }
+            return pokeList;
         }
     }
 }
