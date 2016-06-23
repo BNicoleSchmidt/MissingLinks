@@ -64,25 +64,23 @@ namespace MissingLinks.Controllers
                 {
                     if (col.InnerHtml.Contains("/dex/pokemon")) poke.Name = col.InnerText;
                     if (col.Attributes["class"] == null || !col.Attributes["class"].Value.Contains("egg-group")) continue;
-                    if (!col.InnerHtml.Contains("<br>"))
-                    {
-                        poke.EggGroups.Add(col.InnerText.Trim());
-                    }
-                    else
-                    {
-                        var eggGroups = col.InnerHtml.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (var eggGroup in eggGroups)
-                        {
-                            if (!string.IsNullOrWhiteSpace(eggGroup) && !eggGroup.Contains("<br>"))
-                            {
-                                poke.EggGroups.Add(eggGroup.Trim());
-                            }
-                        }
-                    }
+                    SetEggGroups(col, poke);
                 }
                 pokeList.Add(poke);
             }
             return pokeList;
+        }
+
+        private static void SetEggGroups(HtmlNode col, Pokemon poke)
+        {
+            var eggGroups = col.InnerHtml.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var eggGroup in eggGroups)
+            {
+                if (!string.IsNullOrWhiteSpace(eggGroup) && !eggGroup.Contains("<br>"))
+                {
+                    poke.EggGroups.Add(eggGroup.Trim());
+                }
+            }
         }
     }
 }
