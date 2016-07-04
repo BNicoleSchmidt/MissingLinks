@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 using HtmlAgilityPack;
@@ -34,23 +35,48 @@ namespace MissingLinks.Controllers
             var learners = GetLearners(doc);
             string levelUps = learners.Any(x => x.LevelUp)
                 ? learners.Where(x => x.LevelUp).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
-                : "Nothing learns this move through this method.";
+                : " Nothing learns this move through this method.";
             string breed = learners.Any(x => x.Breed)
                 ? learners.Where(x => x.Breed).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
-                : "Nothing learns this move through this method.";
+                : " Nothing learns this move through this method.";
             string tutor = learners.Any(x => x.Tutor)
                 ? learners.Where(x => x.Tutor).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
-                : "Nothing learns this move through this method.";
+                : " Nothing learns this move through this method.";
             string machine = learners.Any(x => x.Machine)
                 ? learners.Where(x => x.Machine).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
-                : "Nothing learns this move through this method.";
+                : " Nothing learns this move through this method.";
 
             ViewBag.LevelUps = "By Level-up:" + levelUps;
             ViewBag.Eggs = "By Breeding:" + breed;
             ViewBag.Tutors = "By Tutor:" + tutor;
             ViewBag.Machines = "By TM/HM:" + machine;
 
+            var poke = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Pokemon);
+            var move = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Move);
+
+            string result;
+            if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && (x.LevelUp || x.Tutor || x.Machine)))
+            {
+                result = poke + " learns " + move + " on its own, or can be taught the move. No breeding necessary!";
+            }
+            else if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && x.Breed))
+            {
+                result = GetChain(poke, move, learners);
+                //result = poke + " learns " + move + " somehow.";
+            }
+            else
+            {
+                result = poke + " doesn't seem to learn " + move + ". Did you spell something wrong?";
+            }
+            ViewBag.Result = result;
             return View();
+        }
+
+        private string GetChain(string poke, string move, List<Pokemon> learners)
+        {
+            var pokemon = learners.SingleOrDefault(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase));
+            var compatible = learners.Where(x => x.EggGroups.Any(group => pokemon.EggGroups.Contains(group)));
+            return compatible.Where(x => x != pokemon).Aggregate("", (current, learner) => current + " " + learner.Name);
         }
 
         private List<Pokemon> GetLearners(HtmlDocument doc)

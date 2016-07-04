@@ -1,7 +1,7 @@
 ﻿@{
-    ViewBag.Title = "Summon Veekun";
+    ViewBag.Title = "Missing Links";
 }
-<h2>@ViewBag.Title.</h2>
+<h2>@ViewBag.Title</h2>
 <h3>@ViewBag.Message</h3>
 
 
@@ -9,3 +9,29 @@
 <p>@ViewBag.Eggs</p>
 <p>@ViewBag.Tutors</p>
 <p>@ViewBag.Machines</p>
+<h2>@ViewBag.Result</h2>
+
+<p>Try again?</p>
+@model MissingLinks.Models.InputModel
+@using (Html.BeginForm("SummonVeekun", "Home", FormMethod.Post))
+{
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Pokemon)
+    </div>
+    <div class="editor-field">
+        @Html.EditorFor(model => model.Pokemon)
+        @Html.ValidationMessageFor(model => model.Pokemon)
+    </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Move)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Move)
+            @Html.ValidationMessageFor(model => model.Move)
+        </div>
+        <br/>
+        <p>
+            <input type="submit" value="Do the thing!" />
+        </p>
+}
