@@ -28,34 +28,52 @@ namespace MissingLinks.Controllers
             HtmlWeb web = new HtmlWeb();
             HtmlDocument doc = web.Load(url);
 
-            var result = doc.DocumentNode.SelectNodes("//*[@id=\"dex-page-name\"]")[0].InnerText;
-            ViewBag.LevelUps = "By Level-up:" + GetLearners(doc, "level-up");
-            ViewBag.Eggs = "By Breeding:" + GetLearners(doc, "egg");
-            ViewBag.Tutors = "By Tutor:" + GetLearners(doc, "tutor");
-            ViewBag.Machines = "By TM/HM:" + GetLearners(doc, "machine");
+            var moveName = doc.DocumentNode.SelectNodes("//*[@id=\"dex-page-name\"]")[0].InnerText;
+            ViewBag.Message = moveName;
 
-            ViewBag.Message = result;
+            var learners = GetLearners(doc);
+            string levelUps = learners.Any(x => x.LevelUp)
+                ? learners.Where(x => x.LevelUp).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
+                : "Nothing learns this move through this method.";
+            string breed = learners.Any(x => x.Breed)
+                ? learners.Where(x => x.Breed).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
+                : "Nothing learns this move through this method.";
+            string tutor = learners.Any(x => x.Tutor)
+                ? learners.Where(x => x.Tutor).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
+                : "Nothing learns this move through this method.";
+            string machine = learners.Any(x => x.Machine)
+                ? learners.Where(x => x.Machine).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
+                : "Nothing learns this move through this method.";
+
+            ViewBag.LevelUps = "By Level-up:" + levelUps;
+            ViewBag.Eggs = "By Breeding:" + breed;
+            ViewBag.Tutors = "By Tutor:" + tutor;
+            ViewBag.Machines = "By TM/HM:" + machine;
+
             return View();
         }
 
-        private string GetLearners(HtmlDocument doc, string method)
+        private List<Pokemon> GetLearners(HtmlDocument doc)
         {
-            var levelUpLabel = doc.DocumentNode.SelectNodes("//tr[@id=\"pokemon:" + method + "\"]");
-            if (levelUpLabel == null)
+            var learners = new List<Pokemon>();
+            foreach (var method in new[] {"level-up", "egg", "tutor", "machine"})
             {
-                return " Nothing learns this move by this method.";
+                var methodLabel = doc.DocumentNode.SelectNodes("//tr[@id=\"pokemon:" + method + "\"]");
+                if (methodLabel == null)
+                {
+                    continue;
+                }
+                var methodHeader = methodLabel[0].ParentNode;
+                var table = methodHeader.ParentNode;
+                var methodTable = table.ChildNodes[table.ChildNodes.GetNodeIndex(methodHeader) + 2];
+                var methodLearnerRows = methodTable.ChildNodes;
+                GetLearners(methodLearnerRows, learners, method);
             }
-            var levelUpBar = levelUpLabel[0].ParentNode;
-            var table = levelUpBar.ParentNode;
-            var levelUpLearnerTable = table.ChildNodes[table.ChildNodes.GetNodeIndex(levelUpBar) + 2];
-            var levelUpLearnerRows = levelUpLearnerTable.ChildNodes;
-            var pokeList = GetPokemon(levelUpLearnerRows);
-            return pokeList.Aggregate("", (current, pokemon) => current + " " + pokemon.Name);
+            return learners;
         }
 
-        private static IEnumerable<Pokemon> GetPokemon(HtmlNodeCollection rows)
+        private static void GetLearners(HtmlNodeCollection rows, List<Pokemon> learners, string method)
         {
-            var pokeList = new List<Pokemon>();
             foreach (var row in rows)
             {
                 if (row.Name != "tr") continue;
@@ -66,11 +84,49 @@ namespace MissingLinks.Controllers
                     if (col.Attributes["class"] == null || !col.Attributes["class"].Value.Contains("egg-group")) continue;
                     SetEggGroups(col, poke);
                 }
-                pokeList.Add(poke);
+                if (learners.Any(x => x.Name == poke.Name))
+                {
+                    switch(method)
+                    {
+                        case "level-up":
+                            learners.SingleOrDefault(x => x.Name == poke.Name).LevelUp = true;
+                            break;
+                        case "egg":
+                            learners.SingleOrDefault(x => x.Name == poke.Name).Breed = true;
+                            break;
+                        case "tutor":
+                            learners.SingleOrDefault(x => x.Name == poke.Name).Tutor = true;
+                            break;
+                        case "machine":
+                            learners.SingleOrDefault(x => x.Name == poke.Name).Machine = true;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (method)
+                    {
+                        case "level-up":
+                            poke.LevelUp = true;
+                            learners.Add(poke);
+                            break;
+                        case "egg":
+                            poke.Breed = true;
+                            learners.Add(poke);
+                            break;
+                        case "tutor":
+                            poke.Tutor = true;
+                            learners.Add(poke);
+                            break;
+                        case "machine":
+                            poke.Machine = true;
+                            learners.Add(poke);
+                            break;
+                    }
+                }
             }
-            return pokeList;
         }
-
+        
         private static void SetEggGroups(HtmlNode col, Pokemon poke)
         {
             var eggGroups = col.InnerHtml.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
