@@ -9,7 +9,10 @@
 <p>@ViewBag.Eggs</p>
 <p>@ViewBag.Tutors</p>
 <p>@ViewBag.Machines</p>
-<h2>@ViewBag.Result</h2>
+@foreach (string result in ViewBag.Results)
+{
+    <h2>@result</h2>
+}
 
 <p>Try again?</p>
 @model MissingLinks.Models.InputModel

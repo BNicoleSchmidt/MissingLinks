@@ -54,33 +54,40 @@ namespace MissingLinks.Controllers
             var poke = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Pokemon);
             var move = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Move);
 
-            string result;
+            var results = new List<string>();
             if (string.Equals(poke, "Smeargle", StringComparison.InvariantCultureIgnoreCase))
             {
-                result = "Go sketch it, nerd.";
+                results.Add("Go sketch it, nerd.");
             }
             else if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && (x.LevelUp || x.Tutor || x.Machine)))
             {
-                result = poke + " learns " + move + " on its own, or can be taught the move. No breeding necessary!";
+                results.Add(poke + " learns " + move + " on its own, or can be taught the move. No breeding necessary!");
             }
             else if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && x.Breed))
             {
-                result = GetChain(poke, move, learners);
+                GetChain(poke, move, learners, results);
                 //result = poke + " learns " + move + " somehow.";
             }
             else
             {
-                result = poke + " doesn't seem to learn " + move + ". Did you spell something wrong?";
+                results.Add(poke + " doesn't seem to learn " + move + ". Did you spell something wrong?");
             }
-            ViewBag.Result = result;
+            ViewBag.Results = results.ToArray();
             return View();
         }
 
-        private string GetChain(string poke, string move, List<Pokemon> learners)
+        private void GetChain(string poke, string move, List<Pokemon> learners, List<string> results)
         {
             var pokemon = learners.SingleOrDefault(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase));
             var compatible = learners.Where(x => x.EggGroups.Any(group => pokemon.EggGroups.Contains(group)));
-            return compatible.Where(x => x != pokemon).Aggregate("", (current, learner) => current + " " + learner.Name);
+            if (compatible.Any(x => x != pokemon && (x.LevelUp || x.Tutor || x.Machine)))
+            {
+                results.Add(compatible.Where(x => x != pokemon && (x.LevelUp || x.Tutor || x.Machine)).Aggregate("Learn directly from: ", (current, learner) => current + " " + learner.Name));
+            }
+            if (compatible.Any(x => x != pokemon && x.Breed && !(x.LevelUp || x.Tutor || x.Machine)))
+            { 
+                results.Add(compatible.Where(x => x != pokemon && x.Breed && !(x.LevelUp || x.Tutor || x.Machine)).Aggregate("Learn from these, but must be bred onto them: ", (current, learner) => current + " " + learner.Name));
+            }
         }
 
         private List<Pokemon> GetLearners(HtmlDocument doc)
