@@ -55,7 +55,11 @@ namespace MissingLinks.Controllers
             var move = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Move);
 
             string result;
-            if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && (x.LevelUp || x.Tutor || x.Machine)))
+            if (string.Equals(poke, "Smeargle", StringComparison.InvariantCultureIgnoreCase))
+            {
+                result = "Go sketch it, nerd.";
+            }
+            else if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && (x.LevelUp || x.Tutor || x.Machine)))
             {
                 result = poke + " learns " + move + " on its own, or can be taught the move. No breeding necessary!";
             }
