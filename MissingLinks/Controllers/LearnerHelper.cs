@@ -32,6 +32,7 @@ namespace MissingLinks.Controllers
                         if (col.Attributes["class"] == null || !col.Attributes["class"].Value.Contains("egg-group")) continue;
                         SetEggGroups(col, poke);
                     }
+                    if (poke.Name.Contains("Mega ")) continue;
                     if (learners.Any(x => x.Name == poke.Name))
                     {
                         switch (method)
