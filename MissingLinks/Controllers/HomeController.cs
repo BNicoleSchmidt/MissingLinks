@@ -28,9 +28,6 @@ namespace MissingLinks.Controllers
             HtmlWeb web = new HtmlWeb();
             HtmlDocument doc = web.Load(url);
 
-            var moveName = doc.DocumentNode.SelectNodes("//*[@id=\"dex-page-name\"]")[0].InnerText;
-            ViewBag.Message = moveName;
-
             var learners = _learnerHelper.GetLearners(doc);
             string levelUps = learners.Any(x => x.LevelUp)
                 ? learners.Where(x => x.LevelUp).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
@@ -51,9 +48,10 @@ namespace MissingLinks.Controllers
             ViewBag.Machines = "By TM/HM:" + machine;
 
             var poke = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Pokemon);
-            var move = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Move);
+            ViewBag.Move = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Move);
             
-            var results = _learnerHelper.GetResults(poke, learners, move);
+
+            var results = _learnerHelper.GetResults(poke, learners, ViewBag.Move);
             ViewBag.Results = results.ToArray();
             return View();
         }

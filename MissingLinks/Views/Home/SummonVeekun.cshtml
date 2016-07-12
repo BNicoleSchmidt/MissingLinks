@@ -2,13 +2,9 @@
     ViewBag.Title = "Missing Links";
 }
 <h2>@ViewBag.Title</h2>
-<h3>@ViewBag.Message</h3>
+<h3>@ViewBag.Move</h3>
 
 
-<p>@ViewBag.LevelUps</p>
-<p>@ViewBag.Eggs</p>
-<p>@ViewBag.Tutors</p>
-<p>@ViewBag.Machines</p>
 @foreach (string result in ViewBag.Results)
 {
     <h2>@result</h2>
@@ -38,3 +34,9 @@
             <input type="submit" value="Do the thing!" />
         </p>
 }
+
+<h3>Not good enough for you? This is everything that learns @ViewBag.Move</h3>
+<p>@ViewBag.LevelUps</p>
+<p>@ViewBag.Eggs</p>
+<p>@ViewBag.Tutors</p>
+<p>@ViewBag.Machines</p>
