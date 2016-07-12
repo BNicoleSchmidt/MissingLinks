@@ -100,6 +100,10 @@ namespace MissingLinks.Controllers
             {
                 results.Add(poke + " learns " + move + " on its own, or can be taught the move. No breeding necessary!");
             }
+            else if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && x.EggGroups.Contains("Undiscovered")))
+            {
+                results.Add(poke + " can't breed. I don't know how to get a move onto this. (If this is a baby form of a Pokemon that DOES breed, stay tuned for possible upgrades to this system.)");
+            }
             else if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && x.Breed))
             {
                 GetChain(poke, learners, results);
