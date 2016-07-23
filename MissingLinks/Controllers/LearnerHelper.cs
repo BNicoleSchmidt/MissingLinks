@@ -108,7 +108,6 @@ namespace MissingLinks.Controllers
             else if (learners.Any(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase) && x.Breed))
             {
                 GetChain(poke, learners, results);
-                //result = poke + " learns " + move + " somehow.";
             }
             else
             {
@@ -120,15 +119,38 @@ namespace MissingLinks.Controllers
         private void GetChain(string poke, List<Pokemon> learners, List<string> results)
         {
             var pokemon = learners.SingleOrDefault(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase));
-            var compatible = learners.Where(x => x.EggGroups.Any(group => pokemon.EggGroups.Contains(group)));
-            if (compatible.Any(x => x != pokemon && (x.LevelUp || x.Tutor || x.Machine)))
+            var compatible = getCompatible(learners, pokemon);
+            var directCompatible = getDirectCompatible(compatible, pokemon);
+            var indirectCompatible = compatible.Where(x => x != pokemon && x.Breed && !(x.LevelUp || x.Tutor || x.Machine));
+            if (directCompatible.Any())
             {
-                results.Add(compatible.Where(x => x != pokemon && (x.LevelUp || x.Tutor || x.Machine)).Aggregate("Learn directly from: ", (current, learner) => current + " " + learner.Name));
+                results.Add(directCompatible.Aggregate("Learn directly from: ", (current, learner) => current + " " + learner.Name));
             }
-            if (compatible.Any(x => x != pokemon && x.Breed && !(x.LevelUp || x.Tutor || x.Machine)))
+            else if (indirectCompatible.Any())
             {
-                results.Add(compatible.Where(x => x != pokemon && x.Breed && !(x.LevelUp || x.Tutor || x.Machine)).Aggregate("Learn from these, but must be bred onto them: ", (current, learner) => current + " " + learner.Name));
+                foreach (var learner in indirectCompatible)
+                {
+                    var currentCompatible = new List<Pokemon>();
+                    currentCompatible.AddRange(getCompatible(learners.ToList(), learner));
+                    var currentDirect = getDirectCompatible(currentCompatible, learner);
+                    if (currentDirect.Any())
+                    {
+                        results.Add("Can learn from " + learner.Name + " who learns from " +
+                                    currentDirect.FirstOrDefault().Name + " and possibly others.");
+                    }
+                }
+//                results.Add(indirectCompatible.Aggregate("Learn from these, but must be bred onto them: ", (current, learner) => current + " " + learner.Name));
             }
+        }
+
+        private static IEnumerable<Pokemon> getDirectCompatible(IEnumerable<Pokemon> compatible, Pokemon pokemon)
+        {
+            return compatible.Where(x => x != pokemon && (x.LevelUp || x.Tutor || x.Machine));
+        }
+
+        private static IEnumerable<Pokemon> getCompatible(List<Pokemon> learners, Pokemon pokemon)
+        {
+            return learners.Where(x => x.EggGroups.Any(group => pokemon.EggGroups.Contains(@group)));
         }
     }
 }
