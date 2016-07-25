@@ -11,7 +11,7 @@
         @Html.LabelFor(model => model.Pokemon)
     </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.Pokemon)
+            @Html.TextBoxFor(model => model.Pokemon, new { @class = "form-control", required = "required" })
             @Html.ValidationMessageFor(model => model.Pokemon)
         </div>
 
@@ -19,7 +19,7 @@
             @Html.LabelFor(model => model.Move)
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.Move)
+            @Html.TextBoxFor(model => model.Move, new { @class = "form-control", required = "required" })
             @Html.ValidationMessageFor(model => model.Move)
         </div>
         <br />

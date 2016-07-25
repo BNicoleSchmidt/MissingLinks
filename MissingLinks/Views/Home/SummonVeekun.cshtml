@@ -11,32 +11,85 @@
 }
 
 <p>Try again?</p>
-@model MissingLinks.Models.InputModel
+@using MissingLinks.Models
+@model InputModel
 @using (Html.BeginForm("SummonVeekun", "Home", FormMethod.Post))
 {
     <div class="editor-label">
         @Html.LabelFor(model => model.Pokemon)
     </div>
     <div class="editor-field">
-        @Html.EditorFor(model => model.Pokemon)
+        @Html.TextBoxFor(model => model.Pokemon, new { @class = "form-control", required = "required" })
         @Html.ValidationMessageFor(model => model.Pokemon)
     </div>
 
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Move)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.Move)
-            @Html.ValidationMessageFor(model => model.Move)
-        </div>
-        <br/>
-        <p>
-            <input type="submit" value="Do the thing!" />
-        </p>
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Move)
+    </div>
+    <div class="editor-field">
+        @Html.TextBoxFor(model => model.Move, new { @class = "form-control", required = "required" })
+        @Html.ValidationMessageFor(model => model.Move)
+    </div>
+    <br/>
+    <p>
+        <input type="submit" value="Do the thing!" />
+    </p>
 }
 
-<h3>Not good enough for you? This is everything that learns @ViewBag.Move</h3>
-<p>@ViewBag.LevelUps</p>
-<p>@ViewBag.Eggs</p>
-<p>@ViewBag.Tutors</p>
-<p>@ViewBag.Machines</p>
+<h3>Not good enough for you? This is everything that learns @ViewBag.Move by each method.</h3>
+<h4>By Level-up:</h4>
+<table>
+    <tr>
+        <th>Pokemon</th>
+        <th>Egg Groups</th>
+    </tr>
+    @foreach (Pokemon pokemon in ViewBag.LevelUps)
+    {
+        <tr>
+            <td>@pokemon.Name</td>
+            <td>@pokemon.EggGroups.Aggregate("", (current, currGroup) => current + currGroup + " ")</td>
+        </tr>
+    }
+</table>
+<h4>By Breeding:</h4>
+<table>
+    <tr>
+        <th>Pokemon</th>
+        <th>Egg Groups</th>
+    </tr>
+    @foreach (Pokemon pokemon in ViewBag.Eggs)
+    {
+        <tr>
+            <td>@pokemon.Name</td>
+            <td>@pokemon.EggGroups.Aggregate("", (current, currGroup) => current + currGroup + " ")</td>
+        </tr>
+    }
+</table>
+<h4>By Tutor:</h4>
+<table>
+    <tr>
+        <th>Pokemon</th>
+        <th>Egg Groups</th>
+    </tr>
+    @foreach (Pokemon pokemon in ViewBag.Tutors)
+    {
+        <tr>
+            <td>@pokemon.Name</td>
+            <td>@pokemon.EggGroups.Aggregate("", (current, currGroup) => current + currGroup + " ")</td>
+        </tr>
+    }
+</table>
+<h4>By TM/HM:</h4>
+<table>
+    <tr>
+        <th>Pokemon</th>
+        <th>Egg Groups</th>
+    </tr>
+    @foreach (Pokemon pokemon in ViewBag.Machines)
+    {
+        <tr>
+            <td>@pokemon.Name</td>
+            <td>@pokemon.EggGroups.Aggregate("", (current, currGroup) => current + currGroup + " ")</td>
+        </tr>
+    }
+</table>

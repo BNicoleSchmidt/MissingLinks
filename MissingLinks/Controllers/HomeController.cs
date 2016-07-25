@@ -29,23 +29,11 @@ namespace MissingLinks.Controllers
             HtmlDocument doc = web.Load(url);
 
             var learners = _learnerHelper.GetLearners(doc);
-            string levelUps = learners.Any(x => x.LevelUp)
-                ? learners.Where(x => x.LevelUp).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
-                : " Nothing learns this move through this method.";
-            string breed = learners.Any(x => x.Breed)
-                ? learners.Where(x => x.Breed).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
-                : " Nothing learns this move through this method.";
-            string tutor = learners.Any(x => x.Tutor)
-                ? learners.Where(x => x.Tutor).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
-                : " Nothing learns this move through this method.";
-            string machine = learners.Any(x => x.Machine)
-                ? learners.Where(x => x.Machine).Aggregate("", (current, pokemon) => current + " " + pokemon.Name)
-                : " Nothing learns this move through this method.";
 
-            ViewBag.LevelUps = "By Level-up:" + levelUps;
-            ViewBag.Eggs = "By Breeding:" + breed;
-            ViewBag.Tutors = "By Tutor:" + tutor;
-            ViewBag.Machines = "By TM/HM:" + machine;
+            ViewBag.LevelUps = learners.Where(x => x.LevelUp).ToArray();
+            ViewBag.Eggs = learners.Where(x => x.Breed).ToArray();
+            ViewBag.Tutors = learners.Where(x => x.Tutor).ToArray();
+            ViewBag.Machines = learners.Where(x => x.Machine).ToArray();
 
             var poke = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Pokemon);
             ViewBag.Move = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Move);
