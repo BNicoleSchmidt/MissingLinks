@@ -16,4 +16,16 @@ namespace MissingLinks.Models
             EggGroups = new List<string>();
         }
     }
+
+    public class ApiPokemon
+    {
+        public string Name { get; set; }
+        public List<string> EggGroups { get; set; }
+        public List<Move> Moves { get; set; }
+        public int? EvolvesFrom { get; set; }
+        public int? EvolvesTo { get; set; }
+        public bool MaleOnly { get; set; }
+        public bool FemaleOnly { get; set; }
+        public bool Genderless { get; set; }
+    }
 }
