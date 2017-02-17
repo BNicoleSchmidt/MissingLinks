@@ -1,3 +1,7 @@
 .vs/*
 MissingLinks/bin/*
 MissingLinks/obj/*
+*.sln
+MissingLinksTest/bin/*
+MissingLinksTest/obj/*
+packages/*
