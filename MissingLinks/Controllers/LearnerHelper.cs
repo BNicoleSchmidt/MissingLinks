@@ -9,7 +9,14 @@ using MissingLinks.Services;
 
 namespace MissingLinks.Controllers
 {
-    public class LearnerHelper
+    public interface ILearnerHelper
+    {
+        List<Pokemon> GetLearners(HtmlDocument doc);
+        List<string> GetResults(string poke, List<Pokemon> learners, string move);
+        string GetApiResults(InputModel input);
+    }
+
+    public class LearnerHelper : ILearnerHelper
     {
         private readonly IPokeApiService _pokeApiService;
 

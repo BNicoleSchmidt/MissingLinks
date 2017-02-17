@@ -11,22 +11,22 @@
         <td>"Genderless"</td>
         <td>"EggGroups"</td>
     </tr>
-    @foreach (ApiPokemon pokemon in ViewBag.Test)
-    {
-        <tr>
-            <td>@pokemon.Name</td>
-            <td>@pokemon.FemaleOnly</td>
-            <td>@pokemon.MaleOnly</td>
-            <td>@pokemon.Genderless</td>
-            <td>@pokemon.EggGroups.Aggregate("", (current, currGroup) => current + currGroup + " ")</td>
-        </tr>
-    }
+@*    @foreach (ApiPokemon pokemon in ViewBag.Test)*@
+@*    {*@
+@*        <tr>*@
+@*            <td>@pokemon.Name</td>*@
+@*            <td>@pokemon.FemaleOnly</td>*@
+@*            <td>@pokemon.MaleOnly</td>*@
+@*            <td>@pokemon.Genderless</td>*@
+@*            <td>@pokemon.EggGroups.Aggregate("", (current, currGroup) => current + currGroup + " ")</td>*@
+@*        </tr>*@
+@*    }*@
 </table>
 
-@foreach (string result in ViewBag.Results)
-{
-    <h1>@result</h1>
-}
+@*@foreach (string result in ViewBag.Results)*@
+@*{*@
+    <h1>@ViewBag.Results</h1>
+@*}*@
 
 <p>Try again?</p>
 @using MissingLinks.Models

@@ -46,7 +46,7 @@ namespace MissingLinks.Services
 
                 foreach (var rawMove in rawPokemon["moves"])
                 {
-                    var move = new Move { Name = (string)rawMove["name"], Versions = new List<string>() };
+                    var move = new Move { Name = (string)rawMove["move"]["name"], Versions = new List<string>() };
                     foreach (var rawVersionGroup in rawMove["version_group_details"])
                     {
                         var version = (string)rawVersionGroup["version_group"]["name"];

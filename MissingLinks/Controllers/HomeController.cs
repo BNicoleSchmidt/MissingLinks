@@ -15,7 +15,12 @@ namespace MissingLinks.Controllers
     public class HomeController : Controller
     {
         private readonly VeekunService _veekunService = new VeekunService();
-        private readonly LearnerHelper _learnerHelper = new LearnerHelper();
+        private readonly ILearnerHelper _learnerHelper;
+
+        public HomeController(ILearnerHelper learnerHelper)
+        {
+            _learnerHelper = learnerHelper;
+        }
 
         public ActionResult Index()
         {
@@ -32,9 +37,9 @@ namespace MissingLinks.Controllers
         public ViewResult SummonVeekun(InputModel input)
         {
             var learners = _veekunService.GetLearners(input);
-            var testlearners = PokeApiService.GetAllPokemon();
-
-            ViewBag.Test = testlearners;
+//            var testlearners = PokeApiService.GetAllPokemon();
+//
+//            ViewBag.Test = testlearners;
 
             ViewBag.LevelUps = learners.Where(x => x.LevelUp).ToArray();
             ViewBag.Eggs = learners.Where(x => x.Breed).ToArray();
@@ -45,8 +50,8 @@ namespace MissingLinks.Controllers
             ViewBag.Move = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Move);
 
 
-            var results = _learnerHelper.GetResults(poke, learners, ViewBag.Move);
-            ViewBag.Results = results.ToArray();
+            var results = _learnerHelper.GetApiResults(input);
+            ViewBag.Results = results;
             return View();
         }
     }
