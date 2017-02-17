@@ -27,5 +27,11 @@ namespace MissingLinks.Models
         public bool MaleOnly { get; set; }
         public bool FemaleOnly { get; set; }
         public bool Genderless { get; set; }
+
+        public ApiPokemon()
+        {
+            EggGroups = new List<string>();
+            Moves = new List<Move>();
+        }
     }
 }

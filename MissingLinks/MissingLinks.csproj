@@ -161,6 +161,7 @@
     <Compile Include="Models\Move.cs" />
     <Compile Include="Models\Pokemon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IPokeApiService.cs" />
     <Compile Include="Services\PokeApiService.cs" />
     <Compile Include="Services\VeekunService.cs" />
   </ItemGroup>

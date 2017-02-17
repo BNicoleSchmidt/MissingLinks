@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using MissingLinks.Models;
 using Newtonsoft.Json.Linq;
 
 namespace MissingLinks.Services
 {
-    public static class PokeApiService
+    public class PokeApiService : IPokeApiService
     {
         private static List<ApiPokemon> _allPokemon;
         private static readonly List<string> VersionExclusions = new List<string>
@@ -21,19 +20,17 @@ namespace MissingLinks.Services
             _allPokemon = new List<ApiPokemon>();
             var client = new HttpClient();
 
-            for (var i = 1; i <= 11; i++)
+            for (var i = 1; i <= 25; i++)
             {
                 var rawPokemon = JObject.Parse(await client.GetStringAsync("http://pokeapi.co/api/v2/pokemon/" + i));
                 var rawSpecies = JObject.Parse(await client.GetStringAsync((string)rawPokemon["species"]["url"]));
 
                 var pokemon = new ApiPokemon
                 {
-                    Name = (string)rawPokemon["name"],
-                    Moves = new List<Move>(),
-                    EggGroups = new List<string>(),
-                    FemaleOnly = (int)rawSpecies["gender_rate"] == 8,
-                    MaleOnly = (int)rawSpecies["gender_rate"] == 0,
-                    Genderless = (int)rawSpecies["gender_rate"] == -1
+                    Name = (string) rawPokemon["name"],
+                    FemaleOnly = (int) rawSpecies["gender_rate"] == 8,
+                    MaleOnly = (int) rawSpecies["gender_rate"] == 0,
+                    Genderless = (int) rawSpecies["gender_rate"] == -1
                 };
 
                 //                var evoChain = rawSpecies["evolution_chain"];
@@ -69,9 +66,14 @@ namespace MissingLinks.Services
             }
         }
 
-        public static List<ApiPokemon> GetAllPokemon()
+        public List<ApiPokemon> GetAllPokemon()
         {
             return _allPokemon;
+        }
+
+        public List<ApiPokemon> GetPokemonWithMove(string move)
+        {
+            return _allPokemon.Where(p => p.Moves.Any(m => m.Name == move)).ToList();
         }
     }
 }

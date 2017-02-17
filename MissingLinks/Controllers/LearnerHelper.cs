@@ -1,13 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using HtmlAgilityPack;
+using Microsoft.Ajax.Utilities;
 using MissingLinks.Models;
+using MissingLinks.Services;
 
 namespace MissingLinks.Controllers
 {
     public class LearnerHelper
     {
+        private readonly IPokeApiService _pokeApiService;
+
+        public LearnerHelper(IPokeApiService pokeApiService)
+        {
+            _pokeApiService = pokeApiService;
+        }
+
         public List<Pokemon> GetLearners(HtmlDocument doc)
         {
             var learners = new List<Pokemon>();
@@ -116,11 +126,38 @@ namespace MissingLinks.Controllers
             return results;
         }
 
+        public string GetApiResults(InputModel input)
+        {
+            var lowerName = input.Pokemon.ToLower();
+            var upperName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(lowerName);
+            var lowerMove = input.Move.ToLower();
+            var upperMove = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(lowerMove);
+            if (lowerName.IsNullOrWhiteSpace()) return "I can't tell you about a Pokemon if you haven't given one!";
+            if (lowerMove.IsNullOrWhiteSpace()) return "I can't tell you about a move if you haven't given one!";
+            if (lowerName == "smeargle" && lowerMove != "sketch") return "Go sketch it, nerd.";
+            var allLearners = _pokeApiService.GetPokemonWithMove(lowerMove);
+            var currentPokemon = allLearners.FirstOrDefault(p => p.Name == lowerName);
+            if (currentPokemon == null) return $"{upperName} doesn't seem to learn {upperMove}. Did you spell something wrong?";
+            var learnedMove = currentPokemon.Moves.FirstOrDefault(m => m.Name == lowerMove);
+            if (learnedMove.LevelUp || learnedMove.Machine || learnedMove.Tutor) return $"{upperName} learns {upperMove} on its own, or can be taught the move. No breeding necessary!";
+            var compatible = allLearners.Where(x => x.EggGroups.Any(group => currentPokemon.EggGroups.Contains(@group)));
+            var directCompatible =
+                compatible.Where(
+                    x =>
+                        x != currentPokemon &&
+                        (x.Moves.First(m => m.Name == lowerMove).LevelUp ||
+                         x.Moves.First(m => m.Name == lowerMove).Tutor ||
+                         x.Moves.First(m => m.Name == lowerMove).Machine));
+            if(directCompatible.Any()) return directCompatible.Aggregate("Learn directly from: ", (current, learner) => current + " " + CultureInfo.InvariantCulture.TextInfo.ToTitleCase(learner.Name));
+            return "Dunno yet";
+        }
+
+
         private void GetChain(string poke, List<Pokemon> learners, List<string> results)
         {
             var pokemon = learners.SingleOrDefault(x => string.Equals(x.Name, poke, StringComparison.InvariantCultureIgnoreCase));
-            var compatible = getCompatible(learners, pokemon);
-            var directCompatible = getDirectCompatible(compatible, pokemon);
+            var compatible = GetCompatible(learners, pokemon);
+            var directCompatible = GetDirectCompatible(compatible, pokemon);
             var indirectCompatible = compatible.Where(x => x != pokemon && x.Breed && !(x.LevelUp || x.Tutor || x.Machine));
             if (directCompatible.Any())
             {
@@ -131,8 +168,8 @@ namespace MissingLinks.Controllers
                 foreach (var learner in indirectCompatible)
                 {
                     var currentCompatible = new List<Pokemon>();
-                    currentCompatible.AddRange(getCompatible(learners.ToList(), learner));
-                    var currentDirect = getDirectCompatible(currentCompatible, learner);
+                    currentCompatible.AddRange(GetCompatible(learners.ToList(), learner));
+                    var currentDirect = GetDirectCompatible(currentCompatible, learner);
                     if (currentDirect.Any())
                     {
                         results.Add("Can learn from " + learner.Name + " who learns from " +
@@ -143,12 +180,14 @@ namespace MissingLinks.Controllers
             }
         }
 
-        private static IEnumerable<Pokemon> getDirectCompatible(IEnumerable<Pokemon> compatible, Pokemon pokemon)
+        
+
+        private static IEnumerable<Pokemon> GetDirectCompatible(IEnumerable<Pokemon> compatible, Pokemon pokemon)
         {
             return compatible.Where(x => x != pokemon && (x.LevelUp || x.Tutor || x.Machine));
         }
 
-        private static IEnumerable<Pokemon> getCompatible(List<Pokemon> learners, Pokemon pokemon)
+        private static IEnumerable<Pokemon> GetCompatible(List<Pokemon> learners, Pokemon pokemon)
         {
             return learners.Where(x => x.EggGroups.Any(group => pokemon.EggGroups.Contains(@group)));
         }

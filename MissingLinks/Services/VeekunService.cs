@@ -9,7 +9,7 @@ namespace MissingLinks.Services
     {
         public List<Pokemon> GetLearners(InputModel input)
         {
-            var learnerHelper = new LearnerHelper();
+            var learnerHelper = new LearnerHelper(null);
             var url = "http://www.veekun.com/dex/moves/" + input.Move;
             var web = new HtmlWeb();
             var doc = web.Load(url);
