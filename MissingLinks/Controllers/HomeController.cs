@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web.Mvc;
-using HtmlAgilityPack;
 using MissingLinks.Models;
-using MissingLinks.Services;
-using Newtonsoft.Json.Linq;
 
 namespace MissingLinks.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly VeekunService _veekunService = new VeekunService();
         private readonly ILearnerHelper _learnerHelper;
 
         public HomeController(ILearnerHelper learnerHelper)
@@ -36,22 +28,12 @@ namespace MissingLinks.Controllers
 
         public ViewResult SummonVeekun(InputModel input)
         {
-            var learners = _veekunService.GetLearners(input);
-//            var testlearners = PokeApiService.GetAllPokemon();
-//
-//            ViewBag.Test = testlearners;
-
-            ViewBag.LevelUps = learners.Where(x => x.LevelUp).ToArray();
-            ViewBag.Eggs = learners.Where(x => x.Breed).ToArray();
-            ViewBag.Tutors = learners.Where(x => x.Tutor).ToArray();
-            ViewBag.Machines = learners.Where(x => x.Machine).ToArray();
-
-            var poke = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Pokemon);
+            ViewBag.LevelUps = _learnerHelper.GetLevelUpLearners(input.Move).ToArray();
+            ViewBag.Eggs = _learnerHelper.GetEggLearners(input.Move).ToArray();
+            ViewBag.Tutors = _learnerHelper.GetTutorLearners(input.Move).ToArray();
+            ViewBag.Machines = _learnerHelper.GetMachineLearners(input.Move).ToArray();
             ViewBag.Move = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(input.Move);
-
-
-            var results = _learnerHelper.GetApiResults(input);
-            ViewBag.Results = results;
+            ViewBag.Results = _learnerHelper.GetApiResults(input);
             return View();
         }
     }

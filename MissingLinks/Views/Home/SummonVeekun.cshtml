@@ -3,30 +3,9 @@
 }
 <h2>@ViewBag.Title</h2>
 <h3>@ViewBag.Move</h3>
-<table>
-    <tr>
-        <td>"Name"</td>
-        <td>"FemaleOnly"</td>
-        <td>"MaleOnly"</td>
-        <td>"Genderless"</td>
-        <td>"EggGroups"</td>
-    </tr>
-@*    @foreach (ApiPokemon pokemon in ViewBag.Test)*@
-@*    {*@
-@*        <tr>*@
-@*            <td>@pokemon.Name</td>*@
-@*            <td>@pokemon.FemaleOnly</td>*@
-@*            <td>@pokemon.MaleOnly</td>*@
-@*            <td>@pokemon.Genderless</td>*@
-@*            <td>@pokemon.EggGroups.Aggregate("", (current, currGroup) => current + currGroup + " ")</td>*@
-@*        </tr>*@
-@*    }*@
-</table>
 
-@*@foreach (string result in ViewBag.Results)*@
-@*{*@
-    <h1>@ViewBag.Results</h1>
-@*}*@
+
+<h1>@ViewBag.Results</h1>
 
 <p>Try again?</p>
 @using MissingLinks.Models

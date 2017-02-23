@@ -20,7 +20,7 @@ namespace MissingLinks.Services
             _allPokemon = new List<ApiPokemon>();
             var client = new HttpClient();
 
-            for (var i = 1; i <= 25; i++)
+            for (var i = 1; i <= 811; i++)
             {
                 var rawPokemon = JObject.Parse(await client.GetStringAsync("http://pokeapi.co/api/v2/pokemon/" + i));
                 var rawSpecies = JObject.Parse(await client.GetStringAsync((string)rawPokemon["species"]["url"]));

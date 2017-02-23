@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MissingLinks.Controllers;
 using MissingLinks.Models;
 using MissingLinks.Services;
@@ -100,7 +99,7 @@ namespace MissingLinksTest.Services
         {
             var input = new InputModel { Pokemon = "ferroseed", Move = "spikes" };
             var ferroseed = new ApiPokemon {Name = "ferroseed", Moves = new List<Move> { new Move {Name = "spikes", Breed = true } }, EggGroups = new List<string> { "plant", "mineral" } };
-            var klefki = new ApiPokemon {Name = "klefki", Moves = new List<Move> { new Move {Name = "spikes", LevelUp = true } }, EggGroups = new List<string> { "mineral" } };
+            var klefki = new ApiPokemon {Name = "klefki", Moves = new List<Move> { new Move { Name = "spikes", LevelUp = true } }, EggGroups = new List<string> { "mineral" } };
             var cacnea = new ApiPokemon {Name = "cacnea", Moves = new List<Move> { new Move { Name = "spikes", LevelUp = true } }, EggGroups = new List<string> {"plant", "humanshape" } };
             var charmander = new ApiPokemon {Name = "charmander"};
             _pokeService.Setup(x => x.GetPokemonWithMove("spikes")).Returns(new List<ApiPokemon> { klefki, cacnea, charmander, ferroseed });
@@ -108,6 +107,20 @@ namespace MissingLinksTest.Services
             var actual = _testObject.GetApiResults(input);
 
             Assert.AreEqual("Learn directly from:  Klefki Cacnea", actual);
+        }
+
+        [Test]
+        public void GetApiResults_Returns_One_Step_Chain()
+        {
+            var input = new InputModel { Pokemon = "klefki", Move = "switcheroo" };
+            var klefki = new ApiPokemon { Name = "klefki", Moves = new List<Move> { new Move { Name = "switcheroo", Breed = true } }, EggGroups = new List<string> { "mineral"} };
+            var snorunt = new ApiPokemon { Name = "snorunt", Moves = new List<Move> { new Move { Name = "switcheroo", Breed = true } }, EggGroups = new List<string> { "fairy", "mineral" } };
+            var minun = new ApiPokemon { Name = "minun", Moves = new List<Move> { new Move { Name = "switcheroo", LevelUp = true } }, EggGroups = new List<string> { "fairy" } };
+            _pokeService.Setup(x => x.GetPokemonWithMove("switcheroo")).Returns(new List<ApiPokemon> { klefki, snorunt, minun });
+
+            var actual = _testObject.GetApiResults(input);
+
+            Assert.AreEqual("Can learn from Snorunt who learns from Minun and possibly others.", actual);
         }
     }
 }

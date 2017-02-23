@@ -14,6 +14,10 @@ namespace MissingLinks.Controllers
         List<Pokemon> GetLearners(HtmlDocument doc);
         List<string> GetResults(string poke, List<Pokemon> learners, string move);
         string GetApiResults(InputModel input);
+        IEnumerable<PokemonDto> GetLevelUpLearners(string move);
+        IEnumerable<PokemonDto> GetEggLearners(string move);
+        IEnumerable<PokemonDto> GetMachineLearners(string move);
+        IEnumerable<PokemonDto> GetTutorLearners(string move);
     }
 
     public class LearnerHelper : ILearnerHelper
@@ -148,15 +152,61 @@ namespace MissingLinks.Controllers
             var learnedMove = currentPokemon.Moves.FirstOrDefault(m => m.Name == lowerMove);
             if (learnedMove.LevelUp || learnedMove.Machine || learnedMove.Tutor) return $"{upperName} learns {upperMove} on its own, or can be taught the move. No breeding necessary!";
             var compatible = allLearners.Where(x => x.EggGroups.Any(group => currentPokemon.EggGroups.Contains(@group)));
-            var directCompatible =
-                compatible.Where(
-                    x =>
-                        x != currentPokemon &&
-                        (x.Moves.First(m => m.Name == lowerMove).LevelUp ||
-                         x.Moves.First(m => m.Name == lowerMove).Tutor ||
-                         x.Moves.First(m => m.Name == lowerMove).Machine));
+            var directCompatible = GetDirectCompatible(compatible, currentPokemon, lowerMove);
             if(directCompatible.Any()) return directCompatible.Aggregate("Learn directly from: ", (current, learner) => current + " " + CultureInfo.InvariantCulture.TextInfo.ToTitleCase(learner.Name));
+            foreach (var learner in allLearners)
+            {
+                var currentCompatible = allLearners.Where(x => x != learner && x.EggGroups.Any(group => learner.EggGroups.Contains(@group)));
+                var currentDirect = GetDirectCompatible(currentCompatible, learner, lowerMove);
+                if (currentDirect.Any()) return $"Can learn from {CultureInfo.InvariantCulture.TextInfo.ToTitleCase(learner.Name)} who learns from {CultureInfo.InvariantCulture.TextInfo.ToTitleCase(currentDirect.First().Name)} and possibly others.";
+            }
             return "Dunno yet";
+        }
+
+        public IEnumerable<PokemonDto> GetLevelUpLearners(string move)
+        {
+            var levelUpLearners = _pokeApiService.GetPokemonWithMove(move).Where(x => x.Moves.Any(m => m.Name == move.ToLower() && m.LevelUp));
+            foreach (var learner in levelUpLearners)
+            {
+                yield return new PokemonDto { Name = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(learner.Name), EggGroups = learner.EggGroups };
+            }
+        }
+
+        public IEnumerable<PokemonDto> GetEggLearners(string move)
+        {
+            var eggLearners = _pokeApiService.GetPokemonWithMove(move).Where(x => x.Moves.Any(m => m.Name == move.ToLower() && m.Breed));
+            foreach (var learner in eggLearners)
+            {
+                yield return new PokemonDto { Name = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(learner.Name), EggGroups = learner.EggGroups };
+            }
+        }
+
+        public IEnumerable<PokemonDto> GetMachineLearners(string move)
+        {
+            var machineLearners = _pokeApiService.GetPokemonWithMove(move).Where(x => x.Moves.Any(m => m.Name == move.ToLower() && m.Machine));
+            foreach (var learner in machineLearners)
+            {
+                yield return new PokemonDto { Name = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(learner.Name), EggGroups = learner.EggGroups };
+            }
+        }
+
+        public IEnumerable<PokemonDto> GetTutorLearners(string move)
+        {
+            var tutorLearners = _pokeApiService.GetPokemonWithMove(move).Where(x => x.Moves.Any(m => m.Name == move.ToLower() && m.Tutor));
+            foreach (var learner in tutorLearners)
+            {
+                yield return new PokemonDto { Name = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(learner.Name), EggGroups = learner.EggGroups };
+            }
+        }
+
+        private static List<ApiPokemon> GetDirectCompatible(IEnumerable<ApiPokemon> compatible, ApiPokemon currentPokemon, string lowerMove)
+        {
+            return compatible.Where(
+                x =>
+                    x != currentPokemon &&
+                    (x.Moves.First(m => m.Name == lowerMove).LevelUp ||
+                     x.Moves.First(m => m.Name == lowerMove).Tutor ||
+                     x.Moves.First(m => m.Name == lowerMove).Machine)).ToList();
         }
 
 
