@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using HtmlAgilityPack;
-using Microsoft.Ajax.Utilities;
+//using HtmlAgilityPack;
+//using Microsoft.Ajax.Utilities;
 using MissingLinks.Models;
 using MissingLinks.Services;
 
@@ -11,7 +11,7 @@ namespace MissingLinks.Controllers
 {
     public interface ILearnerHelper
     {
-        List<Pokemon> GetLearners(HtmlDocument doc);
+//        List<Pokemon> GetLearners(HtmlDocument doc);
         List<string> GetResults(string poke, List<Pokemon> learners, string move);
         string GetApiResults(InputModel input);
         IEnumerable<PokemonDto> GetLevelUpLearners(string move);
@@ -29,87 +29,87 @@ namespace MissingLinks.Controllers
             _pokeApiService = pokeApiService;
         }
 
-        public List<Pokemon> GetLearners(HtmlDocument doc)
-        {
-            var learners = new List<Pokemon>();
-            foreach (var method in new[] {"level-up", "egg", "tutor", "machine"})
-            {
-                var methodLabel = doc.DocumentNode.SelectNodes("//tr[@id=\"pokemon:" + method + "\"]");
-                if (methodLabel == null)
-                {
-                    continue;
-                }
-                var methodHeader = methodLabel[0].ParentNode;
-                var table = methodHeader.ParentNode;
-                var methodTable = table.ChildNodes[table.ChildNodes.GetNodeIndex(methodHeader) + 2];
-                var methodLearnerRows = methodTable.ChildNodes;
-                foreach (var row in methodLearnerRows)
-                {
-                    if (row.Name != "tr") continue;
-                    var poke = new Pokemon();
-                    foreach (var col in row.ChildNodes)
-                    {
-                        if (col.InnerHtml.Contains("/dex/pokemon")) poke.Name = col.InnerText;
-                        if (col.Attributes["class"] == null || !col.Attributes["class"].Value.Contains("egg-group")) continue;
-                        SetEggGroups(col, poke);
-                    }
-                    if (poke.Name.Contains("Mega ")) continue;
-                    if (learners.Any(x => x.Name == poke.Name))
-                    {
-                        switch (method)
-                        {
-                            case "level-up":
-                                learners.SingleOrDefault(x => x.Name == poke.Name).LevelUp = true;
-                                break;
-                            case "egg":
-                                learners.SingleOrDefault(x => x.Name == poke.Name).Breed = true;
-                                break;
-                            case "tutor":
-                                learners.SingleOrDefault(x => x.Name == poke.Name).Tutor = true;
-                                break;
-                            case "machine":
-                                learners.SingleOrDefault(x => x.Name == poke.Name).Machine = true;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        switch (method)
-                        {
-                            case "level-up":
-                                poke.LevelUp = true;
-                                learners.Add(poke);
-                                break;
-                            case "egg":
-                                poke.Breed = true;
-                                learners.Add(poke);
-                                break;
-                            case "tutor":
-                                poke.Tutor = true;
-                                learners.Add(poke);
-                                break;
-                            case "machine":
-                                poke.Machine = true;
-                                learners.Add(poke);
-                                break;
-                        }
-                    }
-                }
-            }
-            return learners;
-        }
+//        public List<Pokemon> GetLearners(HtmlDocument doc)
+//        {
+//            var learners = new List<Pokemon>();
+//            foreach (var method in new[] {"level-up", "egg", "tutor", "machine"})
+//            {
+//                var methodLabel = doc.DocumentNode.SelectNodes("//tr[@id=\"pokemon:" + method + "\"]");
+//                if (methodLabel == null)
+//                {
+//                    continue;
+//                }
+//                var methodHeader = methodLabel[0].ParentNode;
+//                var table = methodHeader.ParentNode;
+//                var methodTable = table.ChildNodes[table.ChildNodes.GetNodeIndex(methodHeader) + 2];
+//                var methodLearnerRows = methodTable.ChildNodes;
+//                foreach (var row in methodLearnerRows)
+//                {
+//                    if (row.Name != "tr") continue;
+//                    var poke = new Pokemon();
+//                    foreach (var col in row.ChildNodes)
+//                    {
+//                        if (col.InnerHtml.Contains("/dex/pokemon")) poke.Name = col.InnerText;
+//                        if (col.Attributes["class"] == null || !col.Attributes["class"].Value.Contains("egg-group")) continue;
+//                        SetEggGroups(col, poke);
+//                    }
+//                    if (poke.Name.Contains("Mega ")) continue;
+//                    if (learners.Any(x => x.Name == poke.Name))
+//                    {
+//                        switch (method)
+//                        {
+//                            case "level-up":
+//                                learners.SingleOrDefault(x => x.Name == poke.Name).LevelUp = true;
+//                                break;
+//                            case "egg":
+//                                learners.SingleOrDefault(x => x.Name == poke.Name).Breed = true;
+//                                break;
+//                            case "tutor":
+//                                learners.SingleOrDefault(x => x.Name == poke.Name).Tutor = true;
+//                                break;
+//                            case "machine":
+//                                learners.SingleOrDefault(x => x.Name == poke.Name).Machine = true;
+//                                break;
+//                        }
+//                    }
+//                    else
+//                    {
+//                        switch (method)
+//                        {
+//                            case "level-up":
+//                                poke.LevelUp = true;
+//                                learners.Add(poke);
+//                                break;
+//                            case "egg":
+//                                poke.Breed = true;
+//                                learners.Add(poke);
+//                                break;
+//                            case "tutor":
+//                                poke.Tutor = true;
+//                                learners.Add(poke);
+//                                break;
+//                            case "machine":
+//                                poke.Machine = true;
+//                                learners.Add(poke);
+//                                break;
+//                        }
+//                    }
+//                }
+//            }
+//            return learners;
+//        }
 
-        private static void SetEggGroups(HtmlNode col, Pokemon poke)
-        {
-            var eggGroups = col.InnerHtml.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var eggGroup in eggGroups)
-            {
-                if (!string.IsNullOrWhiteSpace(eggGroup) && !eggGroup.Contains("<br>"))
-                {
-                    poke.EggGroups.Add(eggGroup.Trim());
-                }
-            }
-        }
+//        private static void SetEggGroups(HtmlNode col, Pokemon poke)
+//        {
+//            var eggGroups = col.InnerHtml.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
+//            foreach (var eggGroup in eggGroups)
+//            {
+//                if (!string.IsNullOrWhiteSpace(eggGroup) && !eggGroup.Contains("<br>"))
+//                {
+//                    poke.EggGroups.Add(eggGroup.Trim());
+//                }
+//            }
+//        }
 
         public List<string> GetResults(string poke, List<Pokemon> learners, string move)
         {
